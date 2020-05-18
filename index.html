@@ -1,0 +1,360 @@
+<html>
+<head>
+<title>CS 470 Final Project</title>
+<link href='http://fonts.googleapis.com/css?family=Nunito:300|Crimson+Text|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" title="Default" href="styles/github.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>  
+
+<link rel="stylesheet" href="highlighting/styles/default.css">
+<script src="highlighting/highlight.pack.js"></script>
+
+<style type="text/css">
+body {
+	margin: 0px;
+	width: 100%;
+	font-family: 'Crimson Text', serif;
+	font-size: 20px;
+	background: #fcfcfc;
+}
+h1 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 28px;
+	margin: 25px 0px 0px 0px;
+	text-transform: lowercase;
+
+}
+
+h2 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 32px;
+	margin: 15px 0px 35px 0px;
+	color: #333;	
+	word-spacing: 3px;
+}
+
+h3 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 26px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+
+h4 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 22px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+
+h5 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 18px;
+	margin: 10px 0px 10px 0px;
+	color: #111;
+	word-spacing: 2px;
+}
+
+p, li {
+	color: #444;
+}
+
+a {
+	color: #DE3737;
+}
+
+.container {
+	margin: 0px auto 0px auto;
+	width: 1160px;
+}
+
+#header {
+	background: #333;
+	width: 100%;
+}
+
+#headersub {
+	color: #ccc;
+	width: 960px;
+	margin: 0px auto 0px auto;
+	padding: 20px 0px 20px 0px;
+}
+
+.chart {
+	width: 480px;
+}
+.lol {
+	font-size: 16px;
+	color: #888;
+	font-style: italic;
+}
+.sep {
+	height: 1px;
+	width: 100%;
+	background: #999;
+	margin: 20px 0px 20px 0px;
+}
+.footer{
+	font-size: 16px;
+}
+.latex {
+	width: 100%;
+}
+
+.latex img {
+	display: block;
+	margin: 0px auto 0px auto;
+}
+
+pre {
+	font-family: 'Droid Sans Mono';
+	font-size: 14px;
+}
+
+table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+table td img {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#contents a {
+}
+</style>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+</head>
+<body>
+<div id="header" >
+<div id="headersub">
+    <h1>Interstitial Lung Disease Classification in Various Dimensions<br>
+    <span style="color: #DE3737">by James Rodriguez and Juan Martinez</span></h1>
+</div>
+</div>
+<div class="container">
+
+<h2>CS 470: ILD Classification Using 2D/2.5D/3D Approaches</h2>
+
+<div style="float: right; padding: 20px">
+<img src="p3slice15.png" alt="A DICOM image slice" width="400" height="400"/>
+<p style="font-size: 14px">A DICOM image slice from a patient with fibrosis. (DICOM images are 512 x 512)</p>
+</div>
+    <h3>Introduction</h3>
+
+<p> 	Many people around the world suffer from a variety of deadly diseases. A sub-variety of those include
+    <span style="color: red">interstital lung diseases</span>. In the United States alone, ~81 per 100,000 men and ~67
+    per 100,000 women suffer from interstitial lung disease, with new cases every year. In more recent current events, doctors
+    are using CT scans, on top of the limited amount of testing available, to diagnose and view the damage
+    the Coronavirus causes to the patient's lungs.
+    <br><br>
+    Our main goal was to classify a 2D lung slice or a 2.5D/3D lung volume with the correct disease using a convolutional
+    neural network (CNN).
+    <br><br>
+    We first had to get enough data of lung images. Luckily, we had a promising dataset, a multimedia collection of cases with interstitial
+    lung diseases (ILDs) at the University Hospitals of Geneva. These included High-resolution computed tomography (HRCT)
+    "image series with three-dimensional annotated regions of pathological lung tissue along with clinical parameters
+    from patients with pathologically proven diagnoses of ILDs." A total of 128 patients, each affected with one or more
+    of the 13 diagnoses of ILDs, and each with their own CT scan volume. The CT scan volume consisted of a number of slices,
+    usually 28 -> 50, each 512 x 512 pixels. The above figure to the right is an example of one slice from a patient's CT scan.
+    That patient is diagnosed with fibrosis. We still needed more data which we will be discussed below on how we created more.
+
+<h3>Approaches/Algorithms</h3>
+    <p>Our step by step process can be simplified into these steps:</p>
+    <ol>
+        <li>Obtain the data and augment it</li>
+        <li>Seperate the data into training and testing (Leave One Patient Out)</li>
+        <li>Choose a network.</li>
+        <li>Train the data using transfer learing or feature extraction</li>
+        <li>Get results and discuss</li>
+    </ol>
+
+    <h4><span style="color: red">2D</span></h4>
+    <p>The 2D method of analyzing lung data was built to compare with that of the ideas in 2.5D and 3D. It was setup with
+        a basic idea of using flat images to train and test on, two options considered were using the smaller patches generated
+        by given mat lab code as well as entire scanned slices of the lungs. Using the axial images of the data created below,
+        data was organized by disease and labeled with each patient. Minor diseases that did not have at least 2-3 patients were
+        removed from the dataset as we chose not to test on patients we trained on. Testing with 2D was taken from 10-13 classes
+        to justify the amount of data involved. Several networks were tested on including googlenet, alexnet, and resnet.</p>
+    <h4><span style="color: red">2.5</span></h4>
+    <h5>Creating the Data</h5>
+    <p>We had two main ways of creating the 2.5D data. The first way was to get a 512 x 512 slice that had a region of interest (ROI)
+    marked and labeled, and create a volume using the slice above and the slice below. If there was no above or below slice, we
+    simply just duplicated the center slice. The first way created a 512 x 512 x 3 volume. The other way involved the use of 3 orthogonal views.
+    We first get a 512 x 512 slice with a ROI, this is our axial view. We then get the sagittal and coronal view based on the center of that ROI.
+    For the sagittal and coronal views, we used the whole depth of the volume. We used different sizes of images with the ROI in the center.
+    Sizes included 512, 64, and 32. So the second way created a SIZE x SIZE for axial, SIZE x DEPTH for sagittal, and DEPTH x SIZE for coronal.
+    The left figure below shows a sample slice. The top right of that figure is the axial view with the ROI in the center.
+        The sagittal view is the bottom left, and the coronal view is bottom right. SIZE option was 64. The other figure on the right
+    shows what the axial, sagittal, and coronal views are.</p>
+    <img src="acs.png" height="373" width="538" style="padding-right: 20px"><img src="reconstruction-planes.png" height="373" width="538">
+    <p>Some issues with the first method was that some patients had more than 1 disease on each slice. This meant that they
+    were trained with the same data but different label. Another issue was that it is not ROI focused, meaning it does not use just the ROI,
+    which has the data we are most interested in.</p>
+    <div style="float: right; padding: 20px">
+        <img src="axial.png"><img src="axial_resize_down.png">
+        <figcaption style="font-size: 14px">Axial 64 x 64 (Left), Axial 28 x 64 (Right)</figcaption>
+    </div>
+    <p>The issue with the second method was that there was not enough depth per patient. Most of the patients had around 30 slices, with only
+    5 patients having the max amount which was 50. In order to combine the 3 views into one image, they had to be the same dimensions.
+    So we either had to a) resize down the axial view to match the other two, or b) resize up the coronal and sagittal to matcht the axial.
+    By resizing the axial slice down, we lose some data. Since the axial slice is the most important one, we need to keep it the same size.
+    The figure below shows the difference between a 64 x 64 axial view and its resized verison of DEPTH 28 x 64.</p>
+    <p>Now we need to create more data. We can do this by rotating the original and new images 90, -90, and 180 deg. We can also duplicate some images,
+    flip/mirror the images, and translate/shift the images</p>
+    <h5>Classification</h5>
+    <p>For classification, we used MATLAB. The first method we tried was transfer learning with the pre-trained neural network Resnet 18.
+    Resnet 18 takes as input images that are 224 x 224 x 3. We simply replace the last layers with the number of classes we have, in this case
+    the number of diseases we have. This method was really slow on Juan's MacBookAir, so we decided to stick our second method which was
+    extracting image features using a pre-train network, and using those features, to train an image classifier. In this case our image
+    classifier was a support vector machine. We can then extract image features from a deep or shallow layer. We only got to test a deep layer.
+    This method is much faster.
+    </p>
+    <p>The easiest way to input sets of images, in MATLAB, into a neural network is to use an image datastore. Usually, your images
+    are already ready to be inputted, however, for each slice that had a ROI, we have a folder and inside it is the 3 orthogonal views we use.
+    Using these folders, we had to create a <code>.mat</code> file for each folder. The <code>.mat</code> file is simply just a struct that just contained the names
+    of the files for which we will create the final image.
+    </p>
+    <div style="float: left; padding: 20px">
+        <img src="directory_structure.png">
+        <p style="font-size: 14px">The directory structure of the images. These are the original amount,<br>64 in size,
+            and each sub directory of each disease is the patient number,<br>slice number, and center x and y coordinates</p>
+    </div>
+    <p>After you have created all the <code>.mat</code> files, the image datastore will need to know that it is looking for
+        the<code>.mat</code> files. Most importantly you need to specify a user defined read function; this function is the function that
+    the image datastore will use to read the files and input them into the neural network. It simply returns the final image we need.</p>
+    <br>
+    <pre style="display: inline-block" class="matlab"><code>
+% code to create the .mat file
+matFileDir = "orthogonal_ROI_64_mat_format_same_amount_rotated"; % destination folder
+parentDir = "orthogonal_ROI_64_same_amount_rotated"; % the folder with the images
+
+parentDirSubDir = dir(parentDir);
+dirFlags = [parentDirSubDir.isdir];
+diseaseSubFolders = parentDirSubDir(dirFlags);
+diseaseSubFolders(ismember( {diseaseSubFolders.name},
+    {'.', '..', '.DS_Store'})) = [];  %remove . and .. and DS_Store
+
+for i = 1:numel(diseaseSubFolders)
+
+    subDirWithFilesPath = parentDir + "/" + diseaseSubFolders(i).name;
+    patientsOfSubDir = dir(subDirWithFilesPath);
+    patientsOfSubDir(ismember( {patientsOfSubDir.name},
+        {'.', '..', '.DS_Store'})) = [];  %remove . and .. and DS_Store
+
+    for j = 1:numel(patientsOfSubDir)
+
+        patientAndFilesPath = subDirWithFilesPath + "/" + patientsOfSubDir(j).name;
+        collection = dir(patientAndFilesPath);
+        collection(ismember( {collection.name},
+            {'.', '..', '.DS_Store'})) = [];  %remove . and .. and DS_Store
+        matFileName = fullfile(matFileDir, diseaseSubFolders(i).name, patientsOfSubDir(j).name);
+        save(matFileName,'collection');
+    end
+end</code></pre>
+    <pre class="matlab"><code>
+imdsTrain = imageDatastore(trainDir,'IncludeSubfolders',true, 'FileExtensions','.mat', 'LabelSource',
+        'foldernames', 'ReadFcn', @matReadOrtho);</code></pre>
+    <pre class="matlab"><code>
+function data = matReadOrtho(filename)
+    % this function creates the final image; resizes sagittal and coronal views to be the max size which would be 512, 64, or 32
+    % final size is SIZE x SIZE by 3
+    inp = load(filename);
+    f = fields(inp);
+    imgFiles = inp.(f{1});
+    img1 = rgb2gray(imread(fullfile(imgFiles(1).folder, imgFiles(1).name)));
+    img2 = rgb2gray(imread(fullfile(imgFiles(2).folder, imgFiles(2).name)));
+    img3 = rgb2gray(imread(fullfile(imgFiles(3).folder, imgFiles(3).name)));
+
+    size_1 = size(img1);
+    maxAll = max(size_1);
+
+    img2 = imresize(img2, [maxAll maxAll]);
+    img3 = imresize(img2, [maxAll maxAll]);
+
+    data = cat(3, img1, img2, img3);
+end
+    </code></pre>
+    <p>These are the different variations we did:</p>
+    <ol>
+        <li>Size 32, original amount of data</li>
+        <li>Size 32, original amount of data and rotated</li>
+        <li>Size 64, original amount of data</li>
+        <li>Size 64, original amount of data and rotated</li>
+        <li>Size 64, same amount of data and rotated</li>
+        <li>Size 512, original amount of data</li>
+        <li>Size 512, original amount of data and rotated</li>
+        <li>Size 512, same amount of data and rotated</li>
+    </ol>
+    <h4><span style="color: red">3D</span></h4>
+    <p>The 3D method was an experiment we had hoped to be the core of our project, however given that there were less
+        than 200 patients for this experiment, many with conflicting diseases, it would difficult to get a grasp on how
+        to increase the dataset for the number of entries per disease.</p>
+
+    <h3>Results</h3>
+    <h4><span style="color: red">2D</span></h4>
+    <p>The results of the 2D method were generated below. As seen in the distribution, Fibrosis is clearly a larger amount, this is given that
+    it contains the most amount of data (without over/undersampling it was ~400 in size compared to many other diseases
+    that were less than 100). The accuracy seen at the top is what was obtained from these experiments. A range of around 18%
+        - 35% was reached during these variations of hyper parameter and network arrangements, likely due to the overfitting of our model with the data.</p>
+    <img src="james%20matrix.png" height="412" width="412" style="padding-right: 10px"><img src="james%20numbers.png" height="378" width="684">
+    <img src="distr.png" style="padding-top: 10px">
+    <h4><span style="color: red">2.5D</span></h4>
+    <p>For transfer learning, our model overfits our data. This means it performs well on the training data but does not perform well on the evaluation data.
+        This can happen when a model learns the detail and noise in the training data to the extent that it negatively impacts the performance of the model on new data.
+    Here we tested on one patient that was not part of the training set using slices above and below.</p>
+    <img src="transfer_learning_model.png">
+    <p>There are a bunch of parameters to play around with but this run alone took 7 hours to complete. That prompted us to shift our focus to feature extraction.
+    This method was faster, with the longest taking 2 hours.</p>
+    <p>We first trained on 512 sized images, and with each disease having around the same amount of data, and rotated. Below we tested on patients 3, 184, and 185
+    who all have fibrosis on their ROI within the slice. The accuracy was 0.648 and our F-score was 0.7864.</p>
+    <img src="p3_184_185_fibrosis_512x512x3_same_amt_rot.png">
+    <p>Then we switched to size 64, and performed a little worse. We still tested on the same patients. The accuracy was 0.5204 and our F-score was 0.6846</p>
+    <img src="p3_184_185_fibrosis_64x64x3_same_amt_rot.png">
+    <p>Size 32 did no better than size 64 and no worse than size 512. However, we still needed to test other diseases and patients because fibrosis, what the previous tested
+    patients had, had the most original and unique data. The figure below is when we tested patient 181, who had both consolidation and reticulation but not both on the same slices.
+    Consolidation and reticulation had the 4th and 5th highest amount of original data. This was still tested on the same amount of data for each disease and size 512.</p>
+    <img src="p181_cons_retic_512x512x3_same_amt_rot.png">
+
+    <h3>Conclusions</h3>
+    <p>We believe that due to either a miscalculation in the separation of data, or in general a lack of patients to use
+        for data in our experiment, may have led to lower results in our accuracy.
+        Some solutions, aside from obtaining more patient's lung scans for this experiment, would have to involve more
+        augmentation of slices and images. Rather than just rotations and transposing of images, cropping and altering
+        with noise may have given us a larger pool of data.</p>
+    <p>For future work, one thing we can do is chnage the pixel mapping. DICOM images use the Houndsfield scale for pixel values,
+    and these are in the range from ~-1000 to ~1000. Since we are using RGB images, we have to map those 2000 values to a range of 0 to 255.
+        Since we used python to augment the data, there could have been a potential lost of pixel data. <a href="https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.imsave.html" target="_blank">We used <code>matplot.imsave</code>
+            and color map <code>gray</code> to save the images.</code></a>We did change the parameters for color scaling to be the min and max of the original DICOM
+        pixel values. Dr. Gill and a previous team created a function that creates a RGB image from the DICOM pixel values. We then we would have to
+    convert to a gray scale image. An example is shown below (left) and the images we used (right) from our python scripts. *Not the same slice, same patient.</p>
+    <img src="gray_HUtoRGB.png" style="padding-right: 10px"><img src="slice_15_X140_Y240_axial.png">
+    <br>
+    <h3>References</h3>
+    <ol>
+    <li><a href="https://drive.google.com/file/d/1ACNRRbnZ0WRWJkqNz2MPZgN7NJyJkpPj/view?usp=sharing">3D Convolutional Neural Network for Automatic Detection of
+        Lung Nodules in Chest CT</a></li>
+    <li><a href="https://drive.google.com/file/d/16wbhtzycNfaz3QsqVe1kqqyejHP8EbGb/view?usp=sharing">The Compact 3D Convolutional Neural Network for Medical Images</a></li>
+    <li><a href="https://drive.google.com/file/d/1lkdtm_DT_DLl6rxuAlGji8Pj6f32Vcli/view?usp=sharing">Classification of Pulmonary CT Images by Using
+        Hybrid 3D-Deep Convolutional Neural Network Architecture</a></li>
+    <li><a href="https://drive.google.com/file/d/10i9GluahjeUGsTodk59a7apVKYJD4yjG/view?usp=sharing">Emphysema Classification Using a Multi-View Convolutional Network</a></li>
+    <li><a href="https://drive.google.com/file/d/1mDcigwNCLyjzVXGtZ63EyxEaKQQs-xFE/view?usp=sharing">Holistic Classification of CT Attenuation Patterns for
+        Interstitial Lung Diseases via Deep Convolutional
+        Neural Networks</a></li>
+    <li><a href="https://drive.google.com/file/d/1SOwFkcOIEZvlrAPidoQALbcRe1U9drOr/view?usp=sharing">Classifcation of Interstitial Lung
+        Abnormality Patterns with an
+        Ensemble of Deep Convolutional
+        Neural Networks</a></li>
+    </ol>
+</div>
+</body>
+</html>
