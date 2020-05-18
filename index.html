@@ -146,7 +146,7 @@ table td img {
 <h2>CS 470: ILD Classification Using 2D/2.5D/3D Approaches</h2>
 
 <div style="float: right; padding: 20px">
-<img src="p3slice15.png" alt="A DICOM image slice" width="400" height="400"/>
+<img src="images/p3slice15.png" alt="A DICOM image slice" width="400" height="400"/>
 <p style="font-size: 14px">A DICOM image slice from a patient with fibrosis. (DICOM images are 512 x 512)</p>
 </div>
     <h3>Introduction</h3>
@@ -196,12 +196,12 @@ table td img {
     The left figure below shows a sample slice. The top right of that figure is the axial view with the ROI in the center.
         The sagittal view is the bottom left, and the coronal view is bottom right. SIZE option was 64. The other figure on the right
     shows what the axial, sagittal, and coronal views are.</p>
-    <img src="acs.png" height="373" width="538" style="padding-right: 20px"><img src="reconstruction-planes.png" height="373" width="538">
+    <img src="images/acs.png" height="373" width="538" style="padding-right: 20px"><img src="images/reconstruction-planes.png" height="373" width="538">
     <p>Some issues with the first method was that some patients had more than 1 disease on each slice. This meant that they
     were trained with the same data but different label. Another issue was that it is not ROI focused, meaning it does not use just the ROI,
     which has the data we are most interested in.</p>
     <div style="float: right; padding: 20px">
-        <img src="axial.png"><img src="axial_resize_down.png">
+        <img src="images/axial.png"><img src="images/axial_resize_down.png">
         <figcaption style="font-size: 14px">Axial 64 x 64 (Left), Axial 28 x 64 (Right)</figcaption>
     </div>
     <p>The issue with the second method was that there was not enough depth per patient. Most of the patients had around 30 slices, with only
@@ -225,7 +225,7 @@ table td img {
     of the files for which we will create the final image.
     </p>
     <div style="float: left; padding: 20px">
-        <img src="directory_structure.png">
+        <img src="images/directory_structure.png">
         <p style="font-size: 14px">The directory structure of the images. These are the original amount,<br>64 in size,
             and each sub directory of each disease is the patient number,<br>slice number, and center x and y coordinates</p>
     </div>
@@ -306,24 +306,24 @@ end
     it contains the most amount of data (without over/undersampling it was ~400 in size compared to many other diseases
     that were less than 100). The accuracy seen at the top is what was obtained from these experiments. A range of around 18%
         - 35% was reached during these variations of hyper parameter and network arrangements, likely due to the overfitting of our model with the data.</p>
-    <img src="james%20matrix.png" height="412" width="412" style="padding-right: 10px"><img src="james%20numbers.png" height="378" width="684">
-    <img src="distr.png" style="padding-top: 10px">
+    <img src="images/james%20matrix.png" height="412" width="412" style="padding-right: 10px"><img src="images/james%20numbers.png" height="378" width="684">
+    <img src="images/distr.png" style="padding-top: 10px">
     <h4><span style="color: red">2.5D</span></h4>
     <p>For transfer learning, our model overfits our data. This means it performs well on the training data but does not perform well on the evaluation data.
         This can happen when a model learns the detail and noise in the training data to the extent that it negatively impacts the performance of the model on new data.
     Here we tested on one patient that was not part of the training set using slices above and below.</p>
-    <img src="transfer_learning_model.png">
+    <img src="images/transfer_learning_model.png">
     <p>There are a bunch of parameters to play around with but this run alone took 7 hours to complete. That prompted us to shift our focus to feature extraction.
     This method was faster, with the longest taking 2 hours.</p>
     <p>We first trained on 512 sized images, and with each disease having around the same amount of data, and rotated. Below we tested on patients 3, 184, and 185
     who all have fibrosis on their ROI within the slice. The accuracy was 0.648 and our F-score was 0.7864.</p>
-    <img src="p3_184_185_fibrosis_512x512x3_same_amt_rot.png">
+    <img src="images/p3_184_185_fibrosis_512x512x3_same_amt_rot.png">
     <p>Then we switched to size 64, and performed a little worse. We still tested on the same patients. The accuracy was 0.5204 and our F-score was 0.6846</p>
-    <img src="p3_184_185_fibrosis_64x64x3_same_amt_rot.png">
+    <img src="images/p3_184_185_fibrosis_64x64x3_same_amt_rot.png">
     <p>Size 32 did no better than size 64 and no worse than size 512. However, we still needed to test other diseases and patients because fibrosis, what the previous tested
     patients had, had the most original and unique data. The figure below is when we tested patient 181, who had both consolidation and reticulation but not both on the same slices.
     Consolidation and reticulation had the 4th and 5th highest amount of original data. This was still tested on the same amount of data for each disease and size 512.</p>
-    <img src="p181_cons_retic_512x512x3_same_amt_rot.png">
+    <img src="images/p181_cons_retic_512x512x3_same_amt_rot.png">
 
     <h3>Conclusions</h3>
     <p>We believe that due to either a miscalculation in the separation of data, or in general a lack of patients to use
@@ -337,7 +337,7 @@ end
             and color map <code>gray</code> to save the images.</code></a>We did change the parameters for color scaling to be the min and max of the original DICOM
         pixel values. Dr. Gill and a previous team created a function that creates a RGB image from the DICOM pixel values. We then we would have to
     convert to a gray scale image. An example is shown below (left) and the images we used (right) from our python scripts. *Not the same slice, same patient.</p>
-    <img src="gray_HUtoRGB.png" style="padding-right: 10px"><img src="slice_15_X140_Y240_axial.png">
+    <img src="images/gray_HUtoRGB.png" style="padding-right: 10px"><img src="images/slice_15_X140_Y240_axial.png">
     <br>
     <h3>References</h3>
     <ol>
